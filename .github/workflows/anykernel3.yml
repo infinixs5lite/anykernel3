@@ -1,0 +1,35 @@
+name: Build on Tag
+
+on:
+  push:
+    tags: '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: https://android.googlesource.com/kernel/manifest -b common-android-4.19-stable
+      uses: actions/checkout@v2
+
+    - name: Checkout zipper
+      uses: actions/checkout@v2
+      with:
+        repository: infinixs5lite/anyKernel3
+        path: zipper
+
+    - name: Android kernel build
+      uses: infinixs5lite/android-kernel-actions@common-android-4.19-stable
+      id: build
+      env:
+        NAME: common-android-4.19-stable
+      with:
+        arch: arm64
+        compiler: gcc/10
+        defconfig: vince_defconfig
+        image: Image.gz-dtb
+
+    - name: Release build
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: ${{ steps.build.outputs.outfile }}
+        token: ${{ secrets.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 }}
